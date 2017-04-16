@@ -1,0 +1,168 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "To create IAM users",
+
+  "Parameters" : {
+    "password": {
+      "Description" : "password for IAM users",
+      "Type": "String"
+    }
+  },
+
+  "Resources" : {
+
+    "accessGroup" : {
+      "Type" : "AWS::IAM::Group"
+    },
+
+    "policy" : {
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : {
+        "PolicyName" : "access",
+        "PolicyDocument" : {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [ "*" ],
+          "Resource": "*"
+        }]
+      },
+      "Groups": [{ "Ref" : "accessGroup" }]
+      }
+    },
+
+    "user1" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    },
+
+    "user2" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    },
+
+    "user3" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    },
+
+    "user4" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    },
+
+    "user5" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    },
+
+    "user6" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    },
+
+    "user7" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    },
+
+    "user8" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    },
+
+    "user9" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    },
+
+    "user10" : {
+      "Type" : "AWS::IAM::User",
+      "Properties" : {
+        "Path" : "/",
+        "LoginProfile" : {"Password" : {"Ref" : "password"}},
+        "Groups" : [{"Ref" : "accessGroup"}]
+      }
+    }
+  },
+
+  "Outputs" : {
+
+    "user1" : {
+      "Description" : "User1",
+      "Value" : { "Ref" : "user1" }
+    },
+    "user2" : {
+      "Description" : "User2",
+      "Value" : { "Ref" : "user2" }
+    },
+    "user3" : {
+      "Description" : "User3",
+      "Value" : { "Ref" : "user3" }
+    },
+    "user4" : {
+      "Description" : "User4",
+      "Value" : { "Ref" : "user4" }
+    },
+    "user5" : {
+      "Description" : "User5",
+      "Value" : { "Ref" : "user5" }
+    },
+    "user6" : {
+      "Description" : "User6",
+      "Value" : { "Ref" : "user6" }
+    },
+    "user7" : {
+      "Description" : "User7",
+      "Value" : { "Ref" : "user7" }
+    },
+    "user8" : {
+      "Description" : "User8",
+      "Value" : { "Ref" : "user8" }
+    },
+    "user9" : {
+      "Description" : "User9",
+      "Value" : { "Ref" : "user9" }
+    },
+    "user10" : {
+      "Description" : "User10",
+      "Value" : { "Ref" : "user10" }
+    }
+  }
+}
+

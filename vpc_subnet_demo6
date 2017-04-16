@@ -1,0 +1,157 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "A Demo Application",
+
+  "Parameters" : {
+    "KeyPairName": {
+      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "ConstraintDescription" : "Must be the name of an existing EC2 KeyPair."
+    }
+  },
+
+  "Resources" : {
+
+    "VPC" : {
+       "Type" : "AWS::EC2::VPC",
+       "Properties" : {
+         "CidrBlock" : "10.0.0.0/16"
+       }
+     },
+
+     "SubnetOne" : {
+       "Type" : "AWS::EC2::Subnet",
+       "Properties" : {
+         "VpcId" : { "Ref" : "VPC" },
+         "CidrBlock" : "10.0.0.0/24",
+         "AvailabilityZone" : "eu-west-1a"
+       }
+     },
+
+     "SubnetTwo" : {
+       "Type" : "AWS::EC2::Subnet",
+       "Properties" : {
+         "VpcId" : { "Ref" : "VPC" },
+         "CidrBlock" : "10.0.1.0/24",
+         "AvailabilityZone" : "eu-west-1b"
+       }
+     },
+
+     "InternetGateway" : {
+       "Type" : "AWS::EC2::InternetGateway"
+     },
+
+     "AttachGateway" : {
+        "Type" : "AWS::EC2::VPCGatewayAttachment",
+        "Properties" : {
+          "VpcId" : { "Ref" : "VPC" },
+          "InternetGatewayId" : { "Ref" : "InternetGateway" }
+        }
+     },
+
+     "RouteTable" : {
+       "Type" : "AWS::EC2::RouteTable",
+       "Properties" : {
+         "VpcId" : {"Ref" : "VPC"}
+       }
+     },
+
+     "Route" : {
+       "Type" : "AWS::EC2::Route",
+       "DependsOn" : "AttachGateway",
+       "Properties" : {
+         "RouteTableId" : { "Ref" : "RouteTable" },
+         "DestinationCidrBlock" : "0.0.0.0/0",
+         "GatewayId" : { "Ref" : "InternetGateway" }
+       }
+     },
+
+     "SubnetRouteTableAssociation1" : {
+       "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+       "Properties" : {
+         "SubnetId" : { "Ref" : "SubnetOne" },
+         "RouteTableId" : { "Ref" : "RouteTable" }
+       }
+     },
+
+     "EC2Instance1" : {
+       "Type" : "AWS::EC2::Instance",
+       "Properties" : {
+         "InstanceType" : "t2.micro",
+         "SecurityGroupIds" : [ {"Fn::GetAtt":["InstanceSecurityGroup", "GroupId"]} ],
+         "KeyName" : { "Ref" : "KeyPairName" },
+         "ImageId" : "ami-bff32ccc",
+         "SubnetId" : { "Ref" : "SubnetOne" },
+         "UserData" : {
+           "Fn::Base64" : { "Fn::Join" : ["",
+             [
+                "#!/bin/bash -ex", "\n",
+                "echo 'hello' > ffff", "\n",
+                "yum -y install nodejs npm --enablerepo=epel", "\n",
+                "yum -y install git", "\n",
+                "git clone https://github.com/sharmp07/demo", "\n",
+                "node demo/app1.js &", "\n"
+             ]
+           ]}
+         }
+       }
+     },
+
+     "IPAddress" : {
+        "Type" : "AWS::EC2::EIP",
+        "DependsOn" : "AttachGateway",
+        "Properties" : {
+          "Domain" : "VPC",
+          "InstanceId" : { "Ref" : "EC2Instance1" }
+        }
+      },
+
+     "EC2Instance2" : {
+       "Type" : "AWS::EC2::Instance",
+       "Properties" : {
+         "InstanceType" : "t2.micro",
+         "SecurityGroupIds" : [ {"Fn::GetAtt":["InstanceSecurityGroup", "GroupId"]} ],
+         "KeyName" : { "Ref" : "KeyPairName" },
+         "ImageId" : "ami-bff32ccc",
+         "SubnetId" : { "Ref" : "SubnetTwo" }
+       }
+     },
+
+     "InstanceSecurityGroup" : {
+       "Type" : "AWS::EC2::SecurityGroup",
+       "Properties" : {
+         "GroupDescription" : "Security groups",
+         "VpcId" : { "Ref" : "VPC" },
+         "SecurityGroupIngress" : [
+           {
+             "IpProtocol" : "tcp",
+             "FromPort" : "22",
+             "ToPort" : "22",
+             "CidrIp" : "0.0.0.0/0"
+           },
+           {
+             "IpProtocol" : "tcp",
+             "FromPort" : "4567",
+             "ToPort" : "4567",
+             "CidrIp" : "0.0.0.0/0"
+           }
+         ]
+       }
+     }
+
+  },
+
+  "Outputs" : {
+    "InstanceId1" : {
+      "Description" : "Instance Id 1",
+      "Value" : { "Ref" : "EC2Instance1" }
+    },
+    "InstanceId2" : {
+      "Description" : "Instance Id 2",
+      "Value" : { "Ref" : "EC2Instance2" }
+    }
+  }
+
+}
+
