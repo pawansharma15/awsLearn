@@ -1,18 +1,18 @@
 
 ## In this chapter we would:
-## Learn about Amazon EC2
-## Install a linux machine(a.k.a instance) on AWS EC2
-## Create an EC2 ssh key pair
-## Open a ssh port on the AWS instance that we have created
-## Then access the installed instance via ssh using secure key pair
+### Learn about Amazon EC2
+### Install a linux machine(a.k.a instance) on AWS EC2
+### Create an EC2 ssh key pair
+### Open a ssh port on the AWS instance that we have created
+### Then access the installed instance via ssh using secure key pair
 
-## EC2 stands for Elastic Compute Cloud. This service allows you to install and configure your desired operating system on a Virtual Machine, also known as instances. It mainly consists of the following components.
+### EC2 stands for Elastic Compute Cloud. This service allows you to install and configure your desired operating system on a Virtual Machine, also known as instances. It mainly consists of the following components.
 Instances: Virtual machines 
-## Volumes: Data volumes, similar to hard disk of our Desktop or Laptops
-## Key pairs: 'ssh' key used to access the instance remotely
-## Load Balancer: Elastic Load Balancing automatically distributes incoming traffic across multiple EC2 instances. You create a load balancer and register instances with the load balancer
-## Security Group: Security group is virtual firewall that controls the traffic for one or more instances. When you launch an instance, you associate one or more security groups with the instance. You add rules to each security group that allow traffic to or from its associated instances
-## Elastic IP: An Elastic IP address is a static IP address that you can assign to your instance. This indicates that there are other type of IP addresses which are not static and keep changing.
+### Volumes: Data volumes, similar to hard disk of our Desktop or Laptops
+### Key pairs: 'ssh' key used to access the instance remotely
+### Load Balancer: Elastic Load Balancing automatically distributes incoming traffic across multiple EC2 instances. You create a load balancer and register instances with the load balancer
+### Security Group: Security group is virtual firewall that controls the traffic for one or more instances. When you launch an instance, you associate one or more security groups with the instance. You add rules to each security group that allow traffic to or from its associated instances
+### Elastic IP: An Elastic IP address is a static IP address that you can assign to your instance. This indicates that there are other type of IP addresses which are not static and keep changing.
 
 Before proceeding please go through the following AWS videos which would help you to understand the features and know how they can be accessed via the GUI popularly called as Management Console
 
