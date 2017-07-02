@@ -1,0 +1,169 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "A Demo Application for ALB",
+
+  "Parameters" : {
+    "KeyPairName": {
+      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "ConstraintDescription" : "Must be the name of an existing EC2 KeyPair."
+    },
+    "subnet1": {
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "subnet2": {
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "VPC": {
+      "Type": "AWS::EC2::VPC::Id"
+    }
+  },
+
+  "Resources" : {
+
+    "InstanceSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Security groups",
+        "SecurityGroupIngress" : [
+          {
+            "IpProtocol" : "tcp",
+            "FromPort" : "22",
+            "ToPort" : "22",
+            "CidrIp" : "0.0.0.0/0"
+          },
+          {
+            "IpProtocol" : "tcp",
+            "FromPort" : "4567",
+            "ToPort" : "4567",
+            "CidrIp" : "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+
+    "LoadBalancerSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Security groups for load balancer",
+        "SecurityGroupIngress" : [
+          {
+            "IpProtocol" : "tcp",
+            "FromPort" : "80",
+            "ToPort" : "80",
+            "CidrIp" : "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+
+    "ElasticLoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+        "SecurityGroups" : [
+          { "Fn::GetAtt" : [ "LoadBalancerSecurityGroup", "GroupId" ] }
+        ],
+        "Subnets" : [
+          { "Ref" : "subnet1"},
+          { "Ref" : "subnet2"}
+        ]
+      }
+    },
+
+    "TargetGroup1": {
+      "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties" : {
+        "Name": "TargetGroup1",
+        "Port": 4567,
+        "Protocol": "HTTP",
+        "VpcId": {"Ref" : "VPC"}
+      }
+    },
+
+    "TargetGroup2": {
+      "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties" : {
+        "Name": "TargetGroup2",
+        "Port": 4567,
+        "Protocol": "HTTP",
+        "VpcId": {"Ref" : "VPC"}
+      }
+    },
+
+    "listner": {
+      "Type" : "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties" : {
+        "DefaultActions" : [
+          {
+            "TargetGroupArn" : { "Ref": "TargetGroup1" },
+            "Type" : "forward"
+          }
+        ],
+        "LoadBalancerArn" : { "Ref" : "ElasticLoadBalancer" },
+        "Port" : 80,
+        "Protocol" : "HTTP"
+      }
+    },
+
+    "ListenerRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "Properties": {
+        "Actions": [{
+          "Type": "forward",
+          "TargetGroupArn": { "Ref": "TargetGroup2" }
+        }],
+        "Conditions": [{
+          "Field": "path-pattern",
+          "Values": [ "/test/*" ]
+        }],
+        "ListenerArn": { "Ref": "listner" },
+        "Priority": 1
+      }
+    },
+
+    "DemoAutoScalingGroup1": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": { "Fn::GetAZs": "" },
+        "LaunchConfigurationName": { "Ref": "DemoLaunchConfiguration" },
+        "MinSize": "2",
+        "MaxSize": "2",
+        "TargetGroupARNs": [{ "Ref": "TargetGroup1" }]
+      }
+    },
+
+    "DemoAutoScalingGroup2": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": { "Fn::GetAZs": "" },
+        "LaunchConfigurationName": { "Ref": "DemoLaunchConfiguration" },
+        "MinSize": "2",
+        "MaxSize": "2",
+        "TargetGroupARNs": [{ "Ref": "TargetGroup2" }]
+      }
+    },
+
+    "DemoLaunchConfiguration": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties" : {
+        "KeyName" : { "Ref" : "KeyPairName" },
+        "ImageId" : "ami-bff32ccc",
+        "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
+        "InstanceType" : "t2.micro",
+        "UserData" : {
+          "Fn::Base64" : { "Fn::Join" : ["",
+            [
+               "#!/bin/bash -ex", "\n",
+               "echo 'hello' > ffff", "\n",
+               "yum -y install nodejs npm --enablerepo=epel", "\n",
+               "yum -y install git", "\n",
+               "git clone https://github.com/sharmp07/demo", "\n",
+               "node demo/app1.js &", "\n"
+            ]
+          ]}
+        }
+      }
+    }
+  }
+}
