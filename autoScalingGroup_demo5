@@ -152,7 +152,7 @@
                "echo 'hello' > ffff", "\n",
                "yum -y install nodejs npm --enablerepo=epel", "\n",
                "yum -y install git", "\n",
-               "git clone https://github.com/sharmp07/demo", "\n",
+               "git clone git clone https://github.com/pawansharma15/awsLearn.git", "\n",
                "node demo/app1.js &", "\n"
             ]
           ]}
